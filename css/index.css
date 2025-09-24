@@ -1,1 +1,28 @@
+body {
+  font: normal 10pt Arial;
+  background: cadetblue;
+  text-align: center;
+}
 
+button {
+  padding: 10px;
+  border-radius: 10px;
+  border-style: groove;
+  border-radius: 10px;
+}
+
+button:active {
+  transform: scale(1.1);
+}
+
+#fruitimg {
+  font-size: 50px;
+}
+
+#fruitmsg {
+  color: blue;
+  font-size: 20pt;
+}
+#fruitimg, button {
+    transition: transform 0.1s ease;
+}
