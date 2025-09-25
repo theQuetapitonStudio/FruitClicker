@@ -1,5 +1,5 @@
 body {
-  font: normal 14px Arial;
+  font: normal 16px Arial;
   background: cadetblue;
   text-align: center;
   margin: 0;
@@ -7,8 +7,8 @@ body {
 }
 
 button {
-  padding: 14px 20px;
-  font-size: 1.2rem;
+  padding: 4vw 6vw;
+  font-size: 5vw;
   border-radius: 12px;
   border: none;
 }
@@ -18,25 +18,14 @@ button:active {
 }
 
 #fruitimg {
-  font-size: 15vw;
+  font-size: 20vw;
 }
 
 #fruitmsg {
   color: blue;
-  font-size: 6vw;
+  font-size: 7vw;
 }
 
 #fruitimg, button {
   transition: transform 0.1s ease;
-}
-
-@media (max-width: 600px) {
-  button {
-    width: 80%;
-    font-size: 1.5rem;
-  }
-
-  #fruitmsg {
-    font-size: 7vw;
-  }
 }
