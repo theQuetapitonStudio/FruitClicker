@@ -13,8 +13,9 @@ button {
   border: none;
 }
 
-#clickmsg , #multimsg{
-  font-size: 35px;
+#clickmsg, #multimsg {
+  font-size: 6vw; 
+  font-weight: bold;
 }
 
 button:active {
