@@ -13,6 +13,10 @@ button {
   border: none;
 }
 
+#clickmsg , #multimsg{
+  font-size: 10vw;
+}
+
 button:active {
   transform: scale(1.1);
 }
@@ -23,7 +27,7 @@ button:active {
 
 #fruitmsg {
   color: blue;
-  font-size: 7vw;
+  font-size: 12vw;
 }
 
 #fruitimg, button {
