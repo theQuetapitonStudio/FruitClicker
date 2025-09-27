@@ -11,8 +11,6 @@ let comunsmsg = document.getElementById("comunsmsg")
 let incomummsg = document.getElementById("incomummsg")
 let raromsg = document.getElementById("raromsg")
 let divinemsg = document.getElementById("divinosmsg")
-let eventotime = document.getElementById("eventotime")
-let tacocusto = document.getElementById("tacocusto")
 
 let fruits = [
     { id: 1, nome: "Banana", custo: 0, power: 1, msg: "🍌", raridade: "comum" },
@@ -50,11 +48,6 @@ if (save) {
 }
 
 let nextFruitIndex = yourfruit.id
-let eventInterval = 3 * 60 * 1000
-let eventDuration = 12 * 1000
-let nextEventTime = Date.now() + eventInterval
-let eventActive = false
-let eventEndTime = 0
 
 clickbtn.addEventListener("click", () => {
     clicks += yourfruit.power
@@ -72,40 +65,7 @@ setInterval(() => {
     localStorage.setItem("save", JSON.stringify(saveData))
 }, 1000)
 
-function updateEventTimer() {
-    let now = Date.now()
-    if (!eventActive) {
-        let remaining = nextEventTime - now
-        if (remaining <= 0) {
-            eventActive = true
-            eventEndTime = now + eventDuration
-            fruits.push({
-                id: 18,
-                nome: "TACO",
-                custo: Math.floor(clicks * 1.2),
-                power: 300,
-                msg: "🌮",
-                raridade: "divino"
-            })
-        } else {
-            let minutes = Math.floor(remaining / 60000)
-            let seconds = Math.floor((remaining % 60000) / 1000)
-            eventotime.textContent = `Próximo evento em: ${minutes}m ${seconds}s`
-            tacocusto.textContent = `Custo do TACO: ${Math.floor(clicks * 1.2)}`
-        }
-    } else {
-        let remaining = eventEndTime - now
-        if (remaining <= 0) {
-            eventActive = false
-            removeFruta(18)
-            nextEventTime = now + eventInterval
-        } else {
-            let seconds = Math.ceil(remaining / 1000)
-            eventotime.textContent = `Evento ativo! Termina em: ${seconds}s`
-            tacocusto.textContent = `Custo do TACO: ${fruits.find(f => f.id === 18)?.custo || 0}`
-        }
-    }
-}
+
 
 function update() {
     requestAnimationFrame(update)
@@ -117,7 +77,6 @@ function update() {
     incomummsg.textContent = fruits.filter(f => f.raridade === "incomum" && f.id <= yourfruit.id).length === 5 ? "Incomuns: Laranja, Kiwi, Uva, Manga, Maçã Verde ✅" : ""
     raromsg.textContent = fruits.filter(f => f.raridade === "raro" && f.id <= yourfruit.id).length === 5 ? "Raros: Cereja, Pera, Coco, Abacate, Milho ✅" : ""
     divinemsg.textContent = fruits.filter(f => f.raridade === "divino" && f.id <= yourfruit.id).length === 2 ? "Divinos: Tomate, LA BATATA ✅" : ""
-    updateEventTimer()
 }
 
 function resetGame() {
