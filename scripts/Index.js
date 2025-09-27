@@ -29,12 +29,21 @@ let fruits = [
     { id: 14, nome: "Abacate", custo: 17000, power: 100, msg: "🥑", raridade: "raro" },
     { id: 15, nome: "Milho", custo: 22000, power: 120, msg: "🌽", raridade: "raro" },
     { id: 16, nome: "Tomate", custo: 29000, power: 150, msg: "🍅", raridade: "divino" },
-    { id: 17, nome: "LA BATATA", custo: 6000, power: 200, msg: "🥔", raridade: "divino" },
+    { id: 17, nome: "LA BATATA", custo: 60000, power: 200, msg: "🥔", raridade: "divino" },
 ]
 
 function removeFruta(id) {
     fruits = fruits.filter(f => f.id !== id)
 }
+
+frutas.push({
+    id: 18,
+    nome: "TACO",
+    custo: 100000,
+    power: 250,
+    msg: "🌮",
+    raridade: "divino"
+})
 
 let save = JSON.parse(localStorage.getItem("save"))
 if (save) {
