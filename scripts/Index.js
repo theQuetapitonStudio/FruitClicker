@@ -7,22 +7,36 @@ let multimsg = document.getElementById("multimsg")
 let clickbtn = document.getElementById("clickbtn")
 let fruitimg = document.getElementById("fruitimg")
 let fruitmsg = document.getElementById("fruitmsg")
+let comunsmsg = document.getElementById("comunsmsg")
+let incomummsg = document.getElementById("incomummsg")
+let raromsg = document.getElementById("raromsg")
+let divinemsg = document.getElementById("divinosmsg")
+let eventotime = document.getElementById("eventotime")
+let tacocusto = document.getElementById("tacocusto")
 
 let fruits = [
-    { id: 1, nome: "Banana", custo: 0, power: 1, msg: "🍌" },
-    { id: 2, nome: "Maçã", custo: 10, power: 2, msg: "🍎" },
-    { id: 3, nome: "Melancia", custo: 30, power: 5, msg: "🍉" },
-    { id: 4, nome: "Abacaxi", custo: 100, power: 12, msg: "🍍" },
-    { id: 5, nome: "Morango", custo: 200, power: 15, msg: "🍓" },
-    { id: 6, nome: "Laranja", custo: 300, power: 20, msg: "🍊" },
-    { id: 7, nome: "Kiwi", custo: 400, power: 25, msg: "🥝" },
-    { id: 8, nome: "Uva", custo: 500, power: 30, msg: "🍇" },
-    { id: 9, nome: "Manga", custo: 650, power: 36, msg: "🥭" },
-    { id: 10, nome: "Maçã Verde", custo: 800, power: 45, msg: "🍏" },
-    { id: 11, nome: "Cereja", custo: 1000, power: 55, msg: "🍒" },
-    { id: 12, nome: "Pera", custo: 1200, power: 70, msg: "🍐" },
-    { id: 13, nome: "Coco", custo: 1500, power: 90, msg: "🥥" }
+    { id: 1, nome: "Banana", custo: 0, power: 1, msg: "🍌", raridade: "comum" },
+    { id: 2, nome: "Maçã", custo: 50, power: 2, msg: "🍎", raridade: "comum" },
+    { id: 3, nome: "Melancia", custo: 100, power: 5, msg: "🍉", raridade: "comum" },
+    { id: 4, nome: "Abacaxi", custo: 800, power: 12, msg: "🍍", raridade: "comum" },
+    { id: 5, nome: "Morango", custo: 1000, power: 15, msg: "🍓", raridade: "comum" },
+    { id: 6, nome: "Laranja", custo: 2000, power: 20, msg: "🍊", raridade: "incomum" },
+    { id: 7, nome: "Kiwi", custo: 3400, power: 25, msg: "🥝", raridade: "incomum" },
+    { id: 8, nome: "Uva", custo: 3800, power: 30, msg: "🍇", raridade: "incomum" },
+    { id: 9, nome: "Manga", custo: 5000, power: 36, msg: "🥭", raridade: "incomum" },
+    { id: 10, nome: "Maçã Verde", custo: 7000, power: 45, msg: "🍏", raridade: "incomum" },
+    { id: 11, nome: "Cereja", custo: 8000, power: 55, msg: "🍒", raridade: "raro" },
+    { id: 12, nome: "Pera", custo: 9800, power: 70, msg: "🍐", raridade: "raro" },
+    { id: 13, nome: "Coco", custo: 10000, power: 90, msg: "🥥", raridade: "raro" },
+    { id: 14, nome: "Abacate", custo: 17000, power: 100, msg: "🥑", raridade: "raro" },
+    { id: 15, nome: "Milho", custo: 22000, power: 120, msg: "🌽", raridade: "raro" },
+    { id: 16, nome: "Tomate", custo: 29000, power: 150, msg: "🍅", raridade: "divino" },
+    { id: 17, nome: "LA BATATA", custo: 6000, power: 200, msg: "🥔", raridade: "divino" },
 ]
+
+function removeFruta(id) {
+    fruits = fruits.filter(f => f.id !== id)
+}
 
 let save = JSON.parse(localStorage.getItem("save"))
 if (save) {
@@ -35,26 +49,63 @@ if (save) {
     multi = yourfruit.power
 }
 
+let nextFruitIndex = yourfruit.id
+let eventInterval = 3 * 60 * 1000
+let eventDuration = 12 * 1000
+let nextEventTime = Date.now() + eventInterval
+let eventActive = false
+let eventEndTime = 0
+
 clickbtn.addEventListener("click", () => {
     clicks += yourfruit.power
     fruitimg.style.transform = "scale(1.1)"
-    setTimeout(() => {
-        fruitimg.style.transform = "scale(1)"
-    }, 100)
-    for (let f of fruits) {
-        if (clicks >= f.custo && f.id > yourfruit.id) {
-            yourfruit = f
-            multi = yourfruit.power
-        }
+    setTimeout(() => { fruitimg.style.transform = "scale(1)" }, 100)
+    if (nextFruitIndex < fruits.length && clicks >= fruits[nextFruitIndex].custo) {
+        yourfruit = fruits[nextFruitIndex]
+        multi = yourfruit.power
+        nextFruitIndex++
     }
 })
 
 setInterval(() => {
-    localStorage.setItem("save", JSON.stringify({
-        clicks: clicks,
-        yourfruitId: yourfruit.id
-    }))
+    let saveData = { clicks: clicks, yourfruitId: yourfruit.id }
+    localStorage.setItem("save", JSON.stringify(saveData))
 }, 1000)
+
+function updateEventTimer() {
+    let now = Date.now()
+    if (!eventActive) {
+        let remaining = nextEventTime - now
+        if (remaining <= 0) {
+            eventActive = true
+            eventEndTime = now + eventDuration
+            fruits.push({
+                id: 18,
+                nome: "TACO",
+                custo: Math.floor(clicks * 1.2),
+                power: 300,
+                msg: "🌮",
+                raridade: "divino"
+            })
+        } else {
+            let minutes = Math.floor(remaining / 60000)
+            let seconds = Math.floor((remaining % 60000) / 1000)
+            eventotime.textContent = `Próximo evento em: ${minutes}m ${seconds}s`
+            tacocusto.textContent = `Custo do TACO: ${Math.floor(clicks * 1.2)}`
+        }
+    } else {
+        let remaining = eventEndTime - now
+        if (remaining <= 0) {
+            eventActive = false
+            removeFruta(18)
+            nextEventTime = now + eventInterval
+        } else {
+            let seconds = Math.ceil(remaining / 1000)
+            eventotime.textContent = `Evento ativo! Termina em: ${seconds}s`
+            tacocusto.textContent = `Custo do TACO: ${fruits.find(f => f.id === 18)?.custo || 0}`
+        }
+    }
+}
 
 function update() {
     requestAnimationFrame(update)
@@ -62,6 +113,17 @@ function update() {
     fruitimg.textContent = yourfruit.msg
     fruitmsg.textContent = "Fruta: " + yourfruit.nome
     multimsg.textContent = "Multiplicador: " + multi + "X"
+    comunsmsg.textContent = fruits.filter(f => f.raridade === "comum" && f.id <= yourfruit.id).length === 5 ? "Comuns: Banana, Maçã, Melancia, Abacaxi, Morango ✅" : ""
+    incomummsg.textContent = fruits.filter(f => f.raridade === "incomum" && f.id <= yourfruit.id).length === 5 ? "Incomuns: Laranja, Kiwi, Uva, Manga, Maçã Verde ✅" : ""
+    raromsg.textContent = fruits.filter(f => f.raridade === "raro" && f.id <= yourfruit.id).length === 5 ? "Raros: Cereja, Pera, Coco, Abacate, Milho ✅" : ""
+    divinemsg.textContent = fruits.filter(f => f.raridade === "divino" && f.id <= yourfruit.id).length === 2 ? "Divinos: Tomate, LA BATATA ✅" : ""
+    updateEventTimer()
+}
+
+function resetGame() {
+    clicks = 0
+    yourfruit = fruits[0]
+    multi = 1
 }
 
 update()
