@@ -1,36 +1,63 @@
 body {
-  font: normal 16px Arial;
-  background: cadetblue;
-  text-align: center;
+  font: 16px "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(135deg, #2e8b87, #1d4e89);
   margin: 0;
   padding: 0;
+  text-align: center;
+  color: #f0f0f0;
+  background-attachment: fixed;
 }
 
 button {
-  padding: 4vw 6vw;
+  padding: 3.5vw 6vw;
   font-size: 5vw;
-  border-radius: 12px;
+  border-radius: 18px;
   border: none;
+  background: linear-gradient(135deg, #ffffff, #f1f1f1);
+  color: #2c2c2c;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+  transition: transform 0.2s ease, background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 
-#clickmsg, #multimsg {
-  font-size: 6vw; 
-  font-weight: bold;
+button:hover {
+  background: linear-gradient(135deg, #f5f5f5, #e6e6e6);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.28);
 }
 
 button:active {
-  transform: scale(1.1);
+  transform: scale(1.08);
+  background: linear-gradient(135deg, #e2e2e2, #d1d1d1);
+  color: #111;
+}
+
+#clickmsg, #multimsg {
+  font-size: 5vw;
+  font-weight: bold;
+  margin: 2vh 0;
+  color: #ffffff;
+  text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
 }
 
 #fruitimg {
-  font-size: 20vw;
+  font-size: 19vw;
+  margin: 2vh 0;
+  transition: transform 0.2s ease;
+  color: #ffd93d;
+  text-shadow: 3px 3px 7px rgba(0,0,0,0.4);
 }
 
 #fruitmsg {
-  color: blue;
-  font-size: 12vw;
+  color: #3ecf8e;
+  font-size: 9vw;
+  margin: 1vh 0;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.35);
 }
 
-#fruitimg, button {
-  transition: transform 0.1s ease;
+#indexmsg {
+  color: #ff4d4d;
+  font-size: 4.5vw;
+  margin-top: 2vh;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.35);
 }
