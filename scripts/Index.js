@@ -36,7 +36,7 @@ function removeFruta(id) {
     fruits = fruits.filter(f => f.id !== id)
 }
 
-frutas.push({
+fruits.push({
     id: 18,
     nome: "TACO",
     custo: 100000,
