@@ -1,6 +1,6 @@
 body {
   font: 16px "Segoe UI", Arial, sans-serif;
-  background: linear-gradient(135deg, #2e8b87, #1d4e89);
+  background: linear-gradient(135deg, #78fff8, #003f8d);
   margin: 0;
   padding: 0;
   text-align: center;
@@ -9,8 +9,8 @@ body {
 }
 
 button {
-  padding: 3.5vw 6vw;
-  font-size: 5vw;
+  padding: clamp(8px, 2vw, 18px) clamp(16px, 4vw, 28px);
+  font-size: clamp(14px, 4vw, 22px);
   border-radius: 18px;
   border: none;
   background: linear-gradient(135deg, #ffffff, #f1f1f1);
@@ -32,7 +32,7 @@ button:active {
 }
 
 #clickmsg, #multimsg {
-  font-size: 5vw;
+  font-size: clamp(18px, 4vw, 28px);
   font-weight: bold;
   margin: 2vh 0;
   color: #ffffff;
@@ -40,7 +40,7 @@ button:active {
 }
 
 #fruitimg {
-  font-size: 19vw;
+  font-size: clamp(60px, 15vw, 180px);
   margin: 2vh 0;
   transition: transform 0.2s ease;
   color: #ffd93d;
@@ -49,7 +49,7 @@ button:active {
 
 #fruitmsg {
   color: #3ecf8e;
-  font-size: 9vw;
+  font-size: clamp(22px, 6vw, 40px);
   margin: 1vh 0;
   font-weight: bold;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.35);
@@ -57,7 +57,7 @@ button:active {
 
 #indexmsg {
   color: #ff4d4d;
-  font-size: 4.5vw;
+  font-size: clamp(16px, 3.5vw, 24px);
   margin-top: 2vh;
   text-shadow: 1px 1px 3px rgba(0,0,0,0.35);
 }
