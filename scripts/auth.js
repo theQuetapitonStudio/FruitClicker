@@ -22,7 +22,8 @@ async function authenticate(endpoint, username, password) {
         window.sessionUser = username;
 
         // Redireciona para index.js pegar o token e carregar dados
-        window.location.href = "index.html";
+        document.getElementById("auth").style.display = "none";
+        document.getElementById("game").style.display = "block";
     } catch (err) {
         authMsg.textContent = err.message;
         console.error(err);
@@ -42,3 +43,4 @@ registerBtn.addEventListener("click", () => {
     if (!username || !password) { authMsg.textContent = "Preencha usuário e senha!"; return; }
     authenticate("register", username, password);
 });
+
