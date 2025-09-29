@@ -4,9 +4,10 @@ import { fruits } from "./fruits.list.js";
 const API = "https://fruitclicker-bdd.onrender.com";
 
 // --- Pegando usuário logado ---
-const username = localStorage.getItem("username"); // salvo no login
-const token = localStorage.getItem(`token_${username}`); // token por usuário
+const username = localStorage.getItem("username");
+const token = localStorage.getItem(`token_${username}`);
 
+// --- Chaves locais ---
 const clicksKey = username ? `clicks_${username}` : null;
 const fruitKey = username ? `fruit_${username}` : null;
 
@@ -15,12 +16,57 @@ export let clicks = clicksKey ? parseInt(localStorage.getItem(clicksKey)) || 0 :
 let multi = 1;
 let yourFruit = fruits[0];
 
+// --- Carrega fruta do localStorage inicialmente ---
 let savedFruitName = fruitKey ? localStorage.getItem(fruitKey) : null;
 if (savedFruitName) {
     const savedFruit = fruits.find(f => f.nome === savedFruitName);
     if (savedFruit) {
         yourFruit = savedFruit;
         multi = yourFruit.power;
+    }
+}
+
+// --- Backend ---
+async function loadUserDataFromBackend() {
+    if (!token) return;
+    try {
+        const res = await fetch(`${API}/loadUserData`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Falha ao carregar dados do usuário");
+        const data = await res.json();
+
+        // Atualiza clicks
+        clicks = data.clicks ?? clicks;
+
+        // Atualiza fruta
+        const savedFruit = fruits.find(f => f.nome === data.fruit);
+        if (savedFruit) {
+            yourFruit = savedFruit;
+            multi = yourFruit.power;
+        }
+
+        // Salva localmente
+        if (clicksKey) localStorage.setItem(clicksKey, clicks);
+        if (fruitKey && yourFruit) localStorage.setItem(fruitKey, yourFruit.nome);
+    } catch (err) {
+        console.error("Erro backend:", err);
+    }
+}
+
+async function saveUserDataToBackend() {
+    if (!token) return;
+    try {
+        await fetch(`${API}/saveUserData`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ clicks, fruit: yourFruit.nome })
+        });
+    } catch (err) {
+        console.error("Erro salvando dados:", err);
     }
 }
 
@@ -32,38 +78,7 @@ export function getClicks() {
 export function addClicks(qtd) {
     clicks += qtd;
     if (clicksKey) localStorage.setItem(clicksKey, clicks);
-    saveClicksToBackend();
-}
-
-// --- Backend opcional ---
-async function loadClicksFromBackend() {
-    if (!token) return;
-    try {
-        const res = await fetch(`${API}/load`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (!res.ok) throw new Error("Falha ao carregar clicks do backend");
-        const data = await res.json();
-        clicks = data.clicks || clicks;
-    } catch (err) {
-        console.error("Erro backend:", err);
-    }
-}
-
-async function saveClicksToBackend() {
-    if (!token) return;
-    try {
-        await fetch(`${API}/save`, {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({ clicks })
-        });
-    } catch (err) {
-        console.error("Erro backend:", err);
-    }
+    saveUserDataToBackend();
 }
 
 // --- Código que só roda se os elementos existirem ---
@@ -77,7 +92,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     const gameDiv = document.getElementById("game");
     const logoutBtn = document.getElementById("logoutBtn");
 
-    // Se os elementos não existirem (ex: minigame), sai do bloco
     if (!fruitimg || !clickmsg || !multimsg || !fruitmsg || !tutorialmsg) return;
 
     if (!username || !token) {
@@ -89,12 +103,10 @@ window.addEventListener("DOMContentLoaded", async () => {
         if (gameDiv) gameDiv.style.display = "block";
     }
 
-    await loadClicksFromBackend();
+    await loadUserDataFromBackend();
 
     // Clique na fruta
-    fruitimg.addEventListener("click", () => {
-        addClicks(multi);
-    });
+    fruitimg.addEventListener("click", () => addClicks(multi));
 
     function checkUpgrade() {
         for (let i = fruits.length - 1; i >= 0; i--) {
@@ -103,6 +115,7 @@ window.addEventListener("DOMContentLoaded", async () => {
                     yourFruit = fruits[i];
                     multi = yourFruit.power;
                     if (fruitKey) localStorage.setItem(fruitKey, yourFruit.nome);
+                    saveUserDataToBackend();
                 }
                 break;
             }
@@ -128,6 +141,8 @@ window.addEventListener("DOMContentLoaded", async () => {
             if (username) {
                 localStorage.removeItem(`token_${username}`);
                 localStorage.removeItem("username");
+                localStorage.removeItem(clicksKey);
+                localStorage.removeItem(fruitKey);
             }
             location.reload();
         });
