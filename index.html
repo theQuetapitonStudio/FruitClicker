@@ -1,26 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title></title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fruit clicker</title>
   <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-  <div id="indexmsg"> Indice: 
-    <div id="comunsmsg">Comuns: Banana, maçã, Melancia, Abacaxi,Morango <br></div>
-    <div id="incomummsg">Incomuns: Laranja, Kiwi, Uva, Manga, Maçã Verde <br></div>
-    <div id="raromsg">Raros: Cereja , Pera, Coco, Abacate, Milho</div>
-    <div id="divinosmsg">Divinos: Tomate, LA BATATA</div>
+  <div id="tutorial">
+    <p id="tutorialmsg">Clique na <span style="color: red;">banana</span></p>
   </div>
-  <p id="fruitimg">🍌</p>
-  <p id="fruitmsg">Fruta: ????</p>
+  <img src="imgs/banana.png" id="fruitimg">
   <p id="clickmsg">Clicks: 0</p>
   <p id="multimsg">Multiplicador: 1X</p>
-  <button id="clickbtn">+1</button>
-  
+  <p id="fruitmsg">Fruta: Banana</p>
+
   <br><br>
-  
-  <script src="scripts/Index.js"></script>
+
+  <button id="minigameBTN" onclick="window.location = 'minigames.html'">MINI GAMES ( NOVO )</button>
+  <script type="module" src="./scripts/index.js" defer></script>
 </body>
 </html>
