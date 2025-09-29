@@ -65,7 +65,10 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     await loadUserData();
 
-    fruitimg.addEventListener("click", () => addClicks(multi));
+    fruitimg.addEventListener("click", () => {
+        addClicks(multi)
+         console.log("clicou!", multi);
+    });
 
     function checkUpgrade() {
         for (let i = fruits.length - 1; i >= 0; i--) {
@@ -100,3 +103,4 @@ window.addEventListener("DOMContentLoaded", async () => {
         });
     }
 });
+
