@@ -6,6 +6,23 @@ const usernameInput = document.getElementById("username");
 const passwordInput = document.getElementById("password");
 const authMsg = document.getElementById("authMsg");
 
+// --- Função para carregar dados do usuário após login/registro ---
+async function loadUserData(username, token) {
+    try {
+        const res = await fetch(`${API}/loadUserData`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Falha ao carregar dados do usuário");
+        const data = await res.json();
+
+        // Salva clicks e fruta no localStorage por usuário
+        localStorage.setItem(`clicks_${username}`, data.clicks ?? 0);
+        localStorage.setItem(`fruit_${username}`, data.fruit ?? "Banana");
+    } catch (err) {
+        console.error("Erro carregando dados:", err);
+    }
+}
+
 // --- Função para login ---
 loginBtn.addEventListener("click", async () => {
     const username = usernameInput.value.trim();
@@ -24,11 +41,14 @@ loginBtn.addEventListener("click", async () => {
         if (!res.ok) throw new Error("Usuário ou senha incorretos");
         const data = await res.json();
 
-        // Salva token e username no localStorage, separados por usuário
+        // Salva token e username no localStorage
         localStorage.setItem("username", username);
         localStorage.setItem(`token_${username}`, data.token);
 
-        // Redireciona ou recarrega para index.js
+        // Carrega clicks e fruta do backend
+        await loadUserData(username, data.token);
+
+        // Recarrega página para aplicar estado
         window.location.reload();
     } catch (err) {
         authMsg.textContent = err.message;
@@ -54,11 +74,14 @@ registerBtn.addEventListener("click", async () => {
         if (!res.ok) throw new Error("Erro ao registrar usuário");
         const data = await res.json();
 
-        // Salva token e username no localStorage, separados por usuário
+        // Salva token e username no localStorage
         localStorage.setItem("username", username);
         localStorage.setItem(`token_${username}`, data.token);
 
-        // Redireciona ou recarrega para index.js
+        // Inicializa dados do usuário no backend
+        await loadUserData(username, data.token);
+
+        // Recarrega página para aplicar estado
         window.location.reload();
     } catch (err) {
         authMsg.textContent = err.message;
