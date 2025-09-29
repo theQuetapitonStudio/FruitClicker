@@ -2,14 +2,13 @@ import { fruits } from "./fruits.list.js";
 
 const API = "https://fruitclicker-bdd.onrender.com";
 
-let token = window.sessionToken;
-let username = window.sessionUser;
-
+let token = null;   // Token atual do usuário
+let username = null; 
 let clicks = 0;
 let multi = 1;
 let yourFruit = fruits[0];
 
-// Carrega dados do backend
+// --- Carrega dados do usuário do backend ---
 async function loadUserData() {
     if (!token) return;
     try {
@@ -20,92 +19,133 @@ async function loadUserData() {
         const data = await res.json();
         clicks = data.clicks ?? 0;
         const savedFruit = fruits.find(f => f.nome === data.fruit);
-        if (savedFruit) { yourFruit = savedFruit; multi = yourFruit.power; }
-    } catch (err) { console.error("Erro carregando dados:", err); }
+        if (savedFruit) {
+            yourFruit = savedFruit;
+            multi = yourFruit.power;
+        }
+    } catch (err) {
+        console.error("Erro carregando dados:", err);
+    }
 }
 
-// Salva dados no backend
+// --- Salva dados no backend ---
 async function saveUserData() {
     if (!token) return;
     try {
         await fetch(`${API}/saveUserData`, {
             method: "POST",
-            headers: { 
+            headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({ clicks, fruit: yourFruit.nome })
         });
-    } catch (err) { console.error("Erro salvando dados:", err); }
+    } catch (err) {
+        console.error("Erro salvando dados:", err);
+    }
 }
 
-export function getClicks() { return clicks; }
-export function addClicks(qtd) { clicks += qtd; saveUserData(); }
+// --- Função de clique ---
+function handleClick() {
+    clicks += multi;
+    saveUserData(); // salva sempre que clicar
+}
 
-window.addEventListener("DOMContentLoaded", async () => {
-    const fruitimg = document.getElementById("fruitimg");
-    const clickmsg = document.getElementById("clickmsg");
-    const multimsg = document.getElementById("multimsg");
-    const fruitmsg = document.getElementById("fruitmsg");
-    const tutorialmsg = document.getElementById("tutorialmsg");
-    const authDiv = document.getElementById("auth");
-    const gameDiv = document.getElementById("game");
-    const logoutBtn = document.getElementById("logoutBtn");
-
-    if (!fruitimg) console.error("fruitimg não encontrado");
-    if (!clickmsg) console.error("clickmsg não encontrado");
-    if (!multimsg) console.error("multimsg não encontrado");
-    if (!fruitmsg) console.error("fruitmsg não encontrado");
-    if (!tutorialmsg) console.error("tutorialmsg não encontrado");
-
-    if (!token) {
-        if (authDiv) authDiv.style.display = "block";
-        if (gameDiv) gameDiv.style.display = "none";
-        return;
-    } else {
-        if (authDiv) authDiv.style.display = "none";
-        if (gameDiv) gameDiv.style.display = "block";
-    }
-
-    await loadUserData();
-
-    fruitimg.addEventListener("click", () => {
-        addClicks(multi)
-         console.log("clicou!", multi);
-    });
-
-    function checkUpgrade() {
-        for (let i = fruits.length - 1; i >= 0; i--) {
-            if (clicks >= fruits[i].custo && yourFruit.nome !== fruits[i].nome) {
-                yourFruit = fruits[i];
-                multi = yourFruit.power;
-                saveUserData();
-                break;
-            }
+// --- Verifica se deve fazer upgrade da fruta ---
+function checkUpgrade() {
+    for (let i = fruits.length - 1; i >= 0; i--) {
+        if (clicks >= fruits[i].custo && yourFruit.nome !== fruits[i].nome) {
+            yourFruit = fruits[i];
+            multi = yourFruit.power;
+            saveUserData();
+            break;
         }
     }
+}
 
-    function update() {
-        requestAnimationFrame(update);
-        checkUpgrade();
-        fruitimg.src = yourFruit.img;
-        clickmsg.textContent = `Clicks: ${clicks}`;
-        multimsg.textContent = `Multiplicador: ${multi}X`;
-        fruitmsg.textContent = `Fruta: ${yourFruit.nome}`;
-        tutorialmsg.innerHTML = `Clique na <span style="color: red;">${yourFruit.nome}</span>`;
-    }
+// --- Atualiza o DOM ---
+function updateDOM() {
+    document.getElementById("clickmsg").textContent = `Clicks: ${clicks}`;
+    document.getElementById("multimsg").textContent = `Multiplicador: ${multi}X`;
+    document.getElementById("fruitmsg").textContent = `Fruta: ${yourFruit.nome}`;
+    document.getElementById("tutorialmsg").innerHTML = `Clique na <span style="color:red;">${yourFruit.nome}</span>`;
+    document.getElementById("fruitimg").src = yourFruit.img;
+}
 
-    update();
+// --- Loop de atualização ---
+function loop() {
+    checkUpgrade();
+    updateDOM();
+    requestAnimationFrame(loop);
+}
 
-    if (logoutBtn) {
-        logoutBtn.addEventListener("click", () => {
-            token = null;
-            username = null;
-            window.sessionToken = null;
-            window.sessionUser = null;
-            window.location.href = "auth.html";
+// --- Função de login ---
+async function login(user, pass) {
+    try {
+        const res = await fetch(`${API}/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: user, password: pass })
         });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Erro no login");
+        token = data.token;
+        username = user;
+        // Esconde login, mostra jogo
+        document.getElementById("auth").style.display = "none";
+        document.getElementById("game").style.display = "block";
+        await loadUserData();
+        loop();
+    } catch (err) {
+        document.getElementById("authMsg").textContent = err.message;
+        console.error(err);
     }
+}
+
+// --- Função de logout ---
+function logout() {
+    token = null;
+    username = null;
+    document.getElementById("auth").style.display = "block";
+    document.getElementById("game").style.display = "none";
+}
+
+// --- DOMContentLoaded ---
+window.addEventListener("DOMContentLoaded", () => {
+    const loginBtn = document.getElementById("loginBtn");
+    const registerBtn = document.getElementById("registerBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const fruitimg = document.getElementById("fruitimg");
+
+    // Click na fruta
+    fruitimg.addEventListener("click", handleClick);
+
+    // Botão de login
+    loginBtn.addEventListener("click", () => {
+        const user = document.getElementById("username").value;
+        const pass = document.getElementById("password").value;
+        login(user, pass);
+    });
+
+    // Botão de logout
+    logoutBtn.addEventListener("click", logout);
+
+    // Botão de registro
+    registerBtn.addEventListener("click", async () => {
+        const user = document.getElementById("username").value;
+        const pass = document.getElementById("password").value;
+        try {
+            const res = await fetch(`${API}/register`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username: user, password: pass })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Erro ao registrar");
+            document.getElementById("authMsg").textContent = "Registrado! Faça login.";
+        } catch (err) {
+            document.getElementById("authMsg").textContent = err.message;
+            console.error(err);
+        }
+    });
 });
-
-
