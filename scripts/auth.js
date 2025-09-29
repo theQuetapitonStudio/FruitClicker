@@ -6,85 +6,39 @@ const usernameInput = document.getElementById("username");
 const passwordInput = document.getElementById("password");
 const authMsg = document.getElementById("authMsg");
 
-// --- Função para carregar dados do usuário após login/registro ---
-async function loadUserData(username, token) {
+// Função de autenticação (login ou registro)
+async function authenticate(endpoint, username, password) {
     try {
-        const res = await fetch(`${API}/loadUserData`, {
-            headers: { "Authorization": `Bearer ${token}` }
+        const res = await fetch(`${API}/${endpoint}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
         });
-        if (!res.ok) throw new Error("Falha ao carregar dados do usuário");
+        if (!res.ok) throw new Error(endpoint === "login" ? "Usuário ou senha incorretos" : "Erro ao registrar usuário");
         const data = await res.json();
 
-        // Salva clicks e fruta no localStorage por usuário
-        localStorage.setItem(`clicks_${username}`, data.clicks ?? 0);
-        localStorage.setItem(`fruit_${username}`, data.fruit ?? "Banana");
+        // Token e usuário ficam apenas na memória
+        window.sessionToken = data.token;
+        window.sessionUser = username;
+
+        // Redireciona para index.js pegar o token e carregar dados
+        window.location.href = "index.html";
     } catch (err) {
-        console.error("Erro carregando dados:", err);
+        authMsg.textContent = err.message;
+        console.error(err);
     }
 }
 
-// --- Função para login ---
-loginBtn.addEventListener("click", async () => {
+loginBtn.addEventListener("click", () => {
     const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
-    if (!username || !password) {
-        authMsg.textContent = "Preencha usuário e senha!";
-        return;
-    }
-
-    try {
-        const res = await fetch(`${API}/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password })
-        });
-        if (!res.ok) throw new Error("Usuário ou senha incorretos");
-        const data = await res.json();
-
-        // Salva token e username no localStorage
-        localStorage.setItem("username", username);
-        localStorage.setItem(`token_${username}`, data.token);
-
-        // Carrega clicks e fruta do backend
-        await loadUserData(username, data.token);
-
-        // Recarrega página para aplicar estado
-        window.location.reload();
-    } catch (err) {
-        authMsg.textContent = err.message;
-        console.error(err);
-    }
+    if (!username || !password) { authMsg.textContent = "Preencha usuário e senha!"; return; }
+    authenticate("login", username, password);
 });
 
-// --- Função para registro ---
-registerBtn.addEventListener("click", async () => {
+registerBtn.addEventListener("click", () => {
     const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
-    if (!username || !password) {
-        authMsg.textContent = "Preencha usuário e senha!";
-        return;
-    }
-
-    try {
-        const res = await fetch(`${API}/register`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password })
-        });
-        if (!res.ok) throw new Error("Erro ao registrar usuário");
-        const data = await res.json();
-
-        // Salva token e username no localStorage
-        localStorage.setItem("username", username);
-        localStorage.setItem(`token_${username}`, data.token);
-
-        // Inicializa dados do usuário no backend
-        await loadUserData(username, data.token);
-
-        // Recarrega página para aplicar estado
-        window.location.reload();
-    } catch (err) {
-        authMsg.textContent = err.message;
-        console.error(err);
-    }
+    if (!username || !password) { authMsg.textContent = "Preencha usuário e senha!"; return; }
+    authenticate("register", username, password);
 });
