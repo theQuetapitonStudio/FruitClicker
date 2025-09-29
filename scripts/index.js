@@ -52,7 +52,11 @@ window.addEventListener("DOMContentLoaded", async () => {
     const gameDiv = document.getElementById("game");
     const logoutBtn = document.getElementById("logoutBtn");
 
-    if (!fruitimg || !clickmsg || !multimsg || !fruitmsg || !tutorialmsg) return;
+    if (!fruitimg) console.error("fruitimg não encontrado");
+    if (!clickmsg) console.error("clickmsg não encontrado");
+    if (!multimsg) console.error("multimsg não encontrado");
+    if (!fruitmsg) console.error("fruitmsg não encontrado");
+    if (!tutorialmsg) console.error("tutorialmsg não encontrado");
 
     if (!token) {
         if (authDiv) authDiv.style.display = "block";
@@ -103,4 +107,5 @@ window.addEventListener("DOMContentLoaded", async () => {
         });
     }
 });
+
 
