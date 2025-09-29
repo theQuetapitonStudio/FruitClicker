@@ -7,17 +7,35 @@
   <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-  <div id="tutorial">
-    <p id="tutorialmsg">Clique na <span style="color: red;">banana</span></p>
+  <!-- Tela de login/registro -->
+  <div id="auth">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Usuário">
+    <input type="password" id="password" placeholder="Senha">
+    <button id="loginBtn">Entrar</button>
+    <button id="registerBtn">Registrar</button>
+    <p id="authMsg"></p>
   </div>
-  <img src="imgs/banana.png" id="fruitimg">
-  <p id="clickmsg">Clicks: 0</p>
-  <p id="multimsg">Multiplicador: 1X</p>
-  <p id="fruitmsg">Fruta: Banana</p>
 
-  <br><br>
+  <!-- Tela do jogo -->
+  <div id="game" style="display:none;">
+    <div id="tutorial">
+      <p id="tutorialmsg">Clique na <span style="color: red;">banana</span></p>
+    </div>
+    <img src="imgs/banana.png" id="fruitimg">
+    <p id="clickmsg">Clicks: 0</p>
+    <p id="multimsg">Multiplicador: 1X</p>
+    <p id="fruitmsg">Fruta: Banana</p>
+    <br><br>
+    <button id="minigameBTN" onclick="window.location = 'minigames.html'">
+      MINI GAMES ( NOVO )
+    </button>
+    <br><br>
+    <button id="logoutBtn">Sair</button>
+  </div>
 
-  <button id="minigameBTN" onclick="window.location = 'minigames.html'">MINI GAMES ( NOVO )</button>
+  <!-- Scripts -->
   <script type="module" src="./scripts/index.js" defer></script>
+  <script src="./scripts/auth.js" defer></script>
 </body>
 </html>
