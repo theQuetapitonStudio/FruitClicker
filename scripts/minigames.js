@@ -1,6 +1,5 @@
-import { getClicks } from "./index.js";
+import { getClicks, addClicks } from "./index.js";
 
-let clicks = getClicks();
 let coconutClicks = 0;
 
 const coconut = document.createElement("img");
@@ -16,7 +15,7 @@ clickDisplay.style.top = "10px";
 clickDisplay.style.left = "10px";
 clickDisplay.style.fontSize = "20px";
 clickDisplay.style.color = "black";
-clickDisplay.textContent = `Clicks: ${clicks}`;
+clickDisplay.textContent = `Clicks: ${getClicks()}`;
 document.body.appendChild(clickDisplay);
 
 function moveCoconut() {
@@ -29,10 +28,10 @@ function moveCoconut() {
 coconut.addEventListener("click", () => {
   coconutClicks++;
   if (coconutClicks >= 5) {
-    clicks += Math.floor(clicks / 2);
+    const bonus = Math.floor(getClicks() / 2); // pega clicks reais
+    addClicks(bonus); // aumenta no index.js e salva corretamente
     coconutClicks = 0;
-    localStorage.setItem("clicks", clicks); 
-    clickDisplay.textContent = `Clicks: ${clicks}`;
+    clickDisplay.textContent = `Clicks: ${getClicks()}`; // atualiza display
   }
   moveCoconut();
 });
