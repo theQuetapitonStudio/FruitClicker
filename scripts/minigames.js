@@ -19,21 +19,21 @@ clickDisplay.textContent = `Clicks: ${getClicks()}`;
 document.body.appendChild(clickDisplay);
 
 function moveCoconut() {
-  const x = Math.random() * (window.innerWidth - 100);
-  const y = Math.random() * (window.innerHeight - 100);
-  coconut.style.left = `${x}px`;
-  coconut.style.top = `${y}px`;
+    const x = Math.random() * (window.innerWidth - 100);
+    const y = Math.random() * (window.innerHeight - 100);
+    coconut.style.left = `${x}px`;
+    coconut.style.top = `${y}px`;
 }
 
 coconut.addEventListener("click", () => {
-  coconutClicks++;
-  if (coconutClicks >= 5) {
-    const bonus = Math.floor(getClicks() / 2); // pega clicks reais
-    addClicks(bonus); // aumenta no index.js e salva corretamente
-    coconutClicks = 0;
-    clickDisplay.textContent = `Clicks: ${getClicks()}`; // atualiza display
-  }
-  moveCoconut();
+    coconutClicks++;
+    if (coconutClicks >= 5) {
+        const bonus = Math.floor(getClicks() / 2);
+        addClicks(bonus);
+        coconutClicks = 0;
+        clickDisplay.textContent = `Clicks: ${getClicks()}`;
+    }
+    moveCoconut();
 });
 
 moveCoconut();
