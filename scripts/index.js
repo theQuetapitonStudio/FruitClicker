@@ -10,33 +10,41 @@ const token = localStorage.getItem(`token_${username}`); // token por usuário
 const clicksKey = username ? `clicks_${username}` : null;
 const fruitKey = username ? `fruit_${username}` : null;
 
+// --- Variáveis do jogo ---
 export let clicks = clicksKey ? parseInt(localStorage.getItem(clicksKey)) || 0 : 0;
 let multi = 1;
 let yourFruit = fruits[0];
 
 let savedFruitName = fruitKey ? localStorage.getItem(fruitKey) : null;
 if (savedFruitName) {
-    let savedFruit = fruits.find(f => f.nome === savedFruitName);
+    const savedFruit = fruits.find(f => f.nome === savedFruitName);
     if (savedFruit) {
         yourFruit = savedFruit;
         multi = yourFruit.power;
     }
 }
 
+// --- Funções exportadas ---
 export function getClicks() {
     return clicks;
 }
 
+export function addClicks(qtd) {
+    clicks += qtd;
+    if (clicksKey) localStorage.setItem(clicksKey, clicks);
+    saveClicksToBackend();
+}
+
 // --- Backend opcional ---
 async function loadClicksFromBackend() {
-    if (!token) return; // sem login não carrega
+    if (!token) return;
     try {
         const res = await fetch(`${API}/load`, {
             headers: { "Authorization": `Bearer ${token}` }
         });
         if (!res.ok) throw new Error("Falha ao carregar clicks do backend");
         const data = await res.json();
-        clicks = data.clicks || clicks; // mantém clicks local se backend estiver vazio
+        clicks = data.clicks || clicks;
     } catch (err) {
         console.error("Erro backend:", err);
     }
@@ -58,7 +66,7 @@ async function saveClicksToBackend() {
     }
 }
 
-// --- Jogo ---
+// --- Código que só roda se os elementos existirem ---
 window.addEventListener("DOMContentLoaded", async () => {
     const fruitimg = document.getElementById("fruitimg");
     const clickmsg = document.getElementById("clickmsg");
@@ -69,23 +77,21 @@ window.addEventListener("DOMContentLoaded", async () => {
     const gameDiv = document.getElementById("game");
     const logoutBtn = document.getElementById("logoutBtn");
 
+    // Se os elementos não existirem (ex: minigame), sai do bloco
+    if (!fruitimg || !clickmsg || !multimsg || !fruitmsg || !tutorialmsg) return;
+
     if (!username || !token) {
-        authDiv.style.display = "block";
-        gameDiv.style.display = "none";
-        return; // não inicia jogo sem login
+        if (authDiv) authDiv.style.display = "block";
+        if (gameDiv) gameDiv.style.display = "none";
+        return;
     } else {
-        authDiv.style.display = "none";
-        gameDiv.style.display = "block";
+        if (authDiv) authDiv.style.display = "none";
+        if (gameDiv) gameDiv.style.display = "block";
     }
 
     await loadClicksFromBackend();
 
-    function addClicks(qtd) {
-        clicks += qtd;
-        if (clicksKey) localStorage.setItem(clicksKey, clicks);
-        saveClicksToBackend();
-    }
-
+    // Clique na fruta
     fruitimg.addEventListener("click", () => {
         addClicks(multi);
     });
