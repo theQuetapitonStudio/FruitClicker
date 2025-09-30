@@ -1,4 +1,3 @@
-
 import { fruits } from "./fruits.list.js"
 import { buyLuckyBlock } from "./lucky-block-system.js"
 
@@ -27,10 +26,8 @@ export function saveData() {
 
 export function getClicks() { return clicks }
 export function setClicks(a) { clicks = a; saveData() }
-
 export function getYourFruit() { return yourFruit }
 export function setYourFruit(f) { yourFruit = f; saveData() }
-
 export function getMulti() { return yourFruit.power }
 export function addClicks(a) { clicks += a; saveData() }
 
@@ -46,10 +43,33 @@ function checkUpgrade() {
     if (nextFruit !== yourFruit) setYourFruit(nextFruit)
 }
 
+function formatNumber(num) {
+    if (num < 1000) return num.toString()
+    const suffixes = ["", "k", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"]
+    function generateSuffix(n) {
+        const letters = "abcdefghijklmnopqrstuvwxyz"
+        let s = ""
+        n--
+        do {
+            s = letters[n % 26] + s
+            n = Math.floor(n / 26) - 1
+        } while (n >= 0)
+        return s
+    }
+    let tier = 0
+    let scaled = num
+    while (scaled >= 1000) {
+        scaled /= 1000
+        tier++
+    }
+    const suffix = tier < suffixes.length ? suffixes[tier] : generateSuffix(tier - suffixes.length + 1)
+    return scaled.toFixed(2).replace(/\.00$/, '') + suffix
+}
+
 function update() {
     requestAnimationFrame(update)
     checkUpgrade()
-    document.getElementById("clickmsg").textContent = `Clicks: ${clicks}`
+    document.getElementById("clickmsg").textContent = `Clicks: ${formatNumber(clicks)}`
     document.getElementById("multimsg").textContent = `Multiplicador: ${getMulti()}X`
     document.getElementById("fruitmsg").textContent = `Fruta: ${yourFruit.nome}`
     document.getElementById("tutorialmsg").innerHTML = `Clique na <span style="color:red;">${yourFruit.nome}</span>`
