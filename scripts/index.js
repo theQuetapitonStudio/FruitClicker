@@ -1,59 +1,59 @@
-import { fruits } from "./fruits.list.js";
 
-export let clicks = 0;
-export let multi = 1;
-let yourFruit = fruits[0];
+import { fruits } from "./fruits.list.js"
+import { buyLuckyBlock } from "./lucky-block-system.js"
 
-const fruitimg = document.getElementById("fruitimg");
+export let clicks = 0
+export let yourFruit = fruits[0]
 
-const saved = localStorage.getItem("fruitClickerData");
+let fruitimg = document.getElementById("fruitimg")
+let lbbtn = document.getElementById("lbbtn")
+
+const saved = localStorage.getItem("fruitClickerData")
 if (saved) {
-    const data = JSON.parse(saved);
-    clicks = data.clicks;
-    multi = data.multi;
-    yourFruit = fruits.find(f => f.nome === data.fruit) || fruits[0];
+    const data = JSON.parse(saved)
+    clicks = data.clicks
+    yourFruit = data.fruit ? data.fruit : fruits[0]
+    if (!fruits.find(f => f.nome === yourFruit.nome)) {
+        fruits.push(yourFruit)
+    }
 }
 
-function saveData() {
+export function saveData() {
     localStorage.setItem("fruitClickerData", JSON.stringify({
         clicks,
-        multi,
-        fruit: yourFruit.nome
-    }));
+        fruit: yourFruit
+    }))
 }
+
+export function getClicks() { return clicks }
+export function setClicks(a) { clicks = a; saveData() }
+
+export function getYourFruit() { return yourFruit }
+export function setYourFruit(f) { yourFruit = f; saveData() }
+
+export function getMulti() { return yourFruit.power }
+export function addClicks(a) { clicks += a; saveData() }
+
+fruitimg.addEventListener("click", () => addClicks(getMulti()))
+lbbtn.addEventListener("click", () => buyLuckyBlock())
 
 function checkUpgrade() {
-    let nextFruit = yourFruit;
-    for (let i = 0; i < fruits.length; i++) {
-        if (clicks >= fruits[i].custo) nextFruit = fruits[i];
-        else break;
+    let nextFruit = yourFruit
+    for (let f of fruits) {
+        if (clicks >= f.custo) nextFruit = f
+        else break
     }
-    if (nextFruit.nome !== yourFruit.nome) {
-        yourFruit = nextFruit;
-        multi = yourFruit.power;
-    }
+    if (nextFruit !== yourFruit) setYourFruit(nextFruit)
 }
-
-export function addClicks(a) {
-    clicks += a;
-    saveData();
-}
-
-export function setClicks(a) {
-    clicks = a;
-    saveData();
-}
-
-fruitimg.addEventListener("click", () => addClicks(multi));
 
 function update() {
-    requestAnimationFrame(update);
-    checkUpgrade();
-    document.getElementById("clickmsg").textContent = `Clicks: ${clicks}`;
-    document.getElementById("multimsg").textContent = `Multiplicador: ${multi}X`;
-    document.getElementById("fruitmsg").textContent = `Fruta: ${yourFruit.nome}`;
-    document.getElementById("tutorialmsg").innerHTML = `Clique na <span style="color:red;">${yourFruit.nome}</span>`;
-    fruitimg.src = yourFruit.img;
+    requestAnimationFrame(update)
+    checkUpgrade()
+    document.getElementById("clickmsg").textContent = `Clicks: ${clicks}`
+    document.getElementById("multimsg").textContent = `Multiplicador: ${getMulti()}X`
+    document.getElementById("fruitmsg").textContent = `Fruta: ${yourFruit.nome}`
+    document.getElementById("tutorialmsg").innerHTML = `Clique na <span style="color:red;">${yourFruit.nome}</span>`
+    fruitimg.src = yourFruit.img
 }
 
-update();
+update()
