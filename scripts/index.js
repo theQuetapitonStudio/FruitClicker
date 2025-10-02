@@ -3,7 +3,6 @@ import { buyLuckyBlock } from "./lucky-block-system.js";
 import { spawnLichia } from "./spawnLichia.js";
 import { admMessage } from "./admMSG.js";
 import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
-import { admSend } from "./admSend.js"
 
 document.body.style.overflow = "hidden";
 
@@ -112,4 +111,5 @@ function update() {
 }
 
 update();
+
 
