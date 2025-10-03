@@ -39,16 +39,19 @@ function localMsg(text, duration = 5000, color = "yellow") {
     setTimeout(() => { msg.style.opacity = 0; setTimeout(() => msg.remove(), 500); }, duration);
 }
 
-function localEvent(name, payload) {
-    console.log("[Evento local]", name, payload);
-    if(name === "spawnLichia") spawnLichia();
-    if (name === "Potato-Truck") spawnPT()
-}
+// recebe eventos do servidor e aplica localmente
+socket.on("applyEvent", ({ name, payload }) => {
+    console.log("[Evento online]", name, payload);
+    if(name === "spawnLichia") spawnLichia(payload?.duracao);
+    if(name === "spawnEromadeite") spawnEromadeite(payload);
+    if(name === "Potato-Truck") spawnPT(payload);
+    if(name === "setClicks") setClicks(payload.value);
+    if(name === "setYourFruit") setYourFruit(payload.value);
+});
 
 function onlineEvent(name, payload = {}) {
     socket.emit("adminCmd", { token: _SECRET_TOKEN, cmd: "event", payload: { name, ...payload } });
 }
-
 
 
 // --- ADMIN COMMANDS ---
@@ -58,17 +61,23 @@ export function getAdminCommands(secret){
     const _k = String.fromCharCode(..._a.map(n => n - 7));
     if(secret !== _k) return null;
 
-    window.getClicks = getClicks;
-    window.setClicks = valor =>  onlineEvent(setClicks(valor));
-    
     const cmds = {
         msg: text => _send("msg", text),
-        event: (name, payload) => localEvent(name, payload),
-        lichia: () => spawnLichia,
-        eromadeite: () => spawnEromadeite,
-        potato_truck: () => spawnPT(),
-        setClicks: value => onlineEvent(setClicks(value)),
+        event: (name, payload) => onlineEvent(name, payload),
+
+        // Eventos online
+        lichia: () => onlineEvent("spawnLichia"),
+        eromadeite: () => onlineEvent("spawnEromadeite"),
+        potato_truck: () => onlineEvent("Potato-Truck"),
+
+        // setters online
+        setClicks: value => onlineEvent("setClicks", { value }),
+        setYourFruit: value => onlineEvent("setYourFruit", { value }),
+
+        // getters locais (não dá pra ser ao vivo sem sync do servidor)
         getClicks: () => getClicks(),
+        getYourFruit: () => getYourFruit(),
+
         localMsg: text => localMsg(text),
     };
 
