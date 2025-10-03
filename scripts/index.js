@@ -15,25 +15,48 @@ let lbbtn = document.getElementById("lbbtn");
 const saved = localStorage.getItem("fruitClickerData");
 if (saved) {
     const data = JSON.parse(saved);
-    clicks = data.clicks;
-    yourFruit = data.fruit ? data.fruit : fruits[0];
-    if (!fruits.find(f => f.nome === yourFruit.nome)) {
-        fruits.push(yourFruit);
+    clicks = data.clicks || 0;
+    if (data.fruits) {
+        data.fruits.forEach(savedFruit => {
+            const f = fruits.find(fruit => fruit.nome === savedFruit.nome);
+            if (f) Object.assign(f, savedFruit);
+            else fruits.push(savedFruit);
+        });
+    }
+    if (data.fruit) {
+        const f = fruits.find(fruit => fruit.nome === data.fruit.nome);
+        yourFruit = f || { ...data.fruit };
     }
 }
 
 export function saveData() {
+    const fruitData = fruits.map(f => ({
+        nome: f.nome,
+        power: f.power,
+        custo: f.custo,
+        img: f.img
+    }));
     localStorage.setItem("fruitClickerData", JSON.stringify({
         clicks,
-        fruit: yourFruit
+        fruit: {
+            nome: yourFruit.nome,
+            power: yourFruit.power,
+            custo: yourFruit.custo,
+            img: yourFruit.img
+        },
+        fruits: fruitData
     }));
 }
 
 export function getClicks() { return clicks; }
 export function setClicks(a) { clicks = a; saveData(); }
+
 export function getYourFruit() { return yourFruit; }
 export function setYourFruit(f) { yourFruit = f; saveData(); }
+
 export function getMulti() { return yourFruit.power; }
+export function setMulti(a) { yourFruit.power = a; saveData(); }
+
 export function addClicks(a) { clicks += a; saveData(); }
 
 fruitimg.addEventListener("click", () => addClicks(getMulti()));
@@ -73,38 +96,27 @@ function formatNumber(num) {
 
 for (let i = localStorage.length - 1; i >= 0; i--) {
     const key = localStorage.key(i);
-    if (key.startsWith('app_')) {
-        localStorage.removeItem(key);
-    }
+    if (key.startsWith('app_')) localStorage.removeItem(key);
 }
 
 const socket = io("https://fruitclicker-bdd-1.onrender.com");
 
-socket.on("globalMsg", (msg) => {
-    admMessage(msg, 10000, "white");
-});
-
-socket.on("globalEvent", (event) => {
-    if (event === "rainPotato") spawnLichia();
-});
+socket.on("globalMsg", (msg) => admMessage(msg, 10000, "white"));
+socket.on("globalEvent", (event) => { if (event === "rainPotato") spawnLichia(); });
 
 const _part1 = "labatataH0SCH8DC9DH9C912723QDB";
 const _part2 = "@@@362FD1102Y7E0H720H7E02H7EXH027DHY2H0X72E";
 const ADMIN_TOKEN = _part1 + _part2;
 
 export function adminSend(cmd, payload) {
-    socket.emit("adminCmd", {
-        token: ADMIN_TOKEN,
-        cmd,
-        payload
-    });
+    socket.emit("adminCmd", { token: ADMIN_TOKEN, cmd, payload });
 }
 
 function update() {
     requestAnimationFrame(update);
     checkUpgrade();
-    document.getElementById("clickmsg").textContent = `Clicks: ${formatNumber(clicks)}`;
-    document.getElementById("multimsg").textContent = `Multiplicador: ${formatNumber(getMulti())}X`;
+    document.getElementById("clickmsg").textContent = `Clicks: ${formatNumber(Math.round(clicks))}`;
+    document.getElementById("multimsg").textContent = `Multiplicador: ${formatNumber(Math.round(getMulti()))}X`;
     document.getElementById("fruitmsg").textContent = `Fruta: ${yourFruit.nome}`;
     document.getElementById("tutorialmsg").innerHTML = `Clique na <span style="color:red;">${yourFruit.nome}</span>`;
     fruitimg.src = yourFruit.img;

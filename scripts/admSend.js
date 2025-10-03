@@ -1,7 +1,8 @@
 import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
 import { spawnLichia } from "./spawnLichia.js";
 import { spawnEromadeite } from "./lucky-block-system.js";
-import { setClicks, getClicks } from "./index.js";
+import { setClicks, getClicks, getYourFruit , setYourFruit} from "./index.js";
+import { spawnPT } from "./Potato-Truck.js";
 
 const socket = io("https://fruitclicker-bdd-1.onrender.com");
 
@@ -41,7 +42,14 @@ function localMsg(text, duration = 5000, color = "yellow") {
 function localEvent(name, payload) {
     console.log("[Evento local]", name, payload);
     if(name === "spawnLichia") spawnLichia();
+    if (name === "Potato-Truck") spawnPT()
 }
+
+function onlineEvent(name, payload = {}) {
+    socket.emit("adminCmd", { token: _SECRET_TOKEN, cmd: "event", payload: { name, ...payload } });
+}
+
+
 
 // --- ADMIN COMMANDS ---
 
@@ -51,20 +59,19 @@ export function getAdminCommands(secret){
     if(secret !== _k) return null;
 
     window.getClicks = getClicks;
-    window.setClicks = setClicks;
-
-    window.lichia = () => spawnLichia();
+    window.setClicks = valor =>  onlineEvent(setClicks(valor));
+    
     const cmds = {
         msg: text => _send("msg", text),
-        event: (name, payload) => _send("event", { name, ...payload }),
-        lichia: () => spawnLichia(),
-        eromadeite: () => spawnEromadeite(),
-        setClicks: value => setClicks(value),
+        event: (name, payload) => localEvent(name, payload),
+        lichia: () => spawnLichia,
+        eromadeite: () => spawnEromadeite,
+        potato_truck: () => spawnPT(),
+        setClicks: value => onlineEvent(setClicks(value)),
         getClicks: () => getClicks(),
-
         localMsg: text => localMsg(text),
-        localEvent: (name, payload) => localEvent(name, payload)
     };
+
     return new Proxy(cmds, {
         get(target, prop) {
             if(prop in target) return target[prop];
@@ -72,7 +79,6 @@ export function getAdminCommands(secret){
             return () => {};
         },
         apply(target, thisArg, args) {
-            // caso queira suportar chamada direta
             return target[args[0]]?.(...args.slice(1));
         }
     });
