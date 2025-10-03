@@ -1,5 +1,7 @@
 import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
 import { spawnLichia } from "./spawnLichia.js";
+import { spawnEromadeite } from "./lucky-block-system.js";
+import { setClicks, getClicks } from "./index.js";
 
 const socket = io("https://fruitclicker-bdd-1.onrender.com");
 
@@ -9,16 +11,69 @@ const _SECRET_TOKEN = _p1 + _p2;
 
 window.admin = getAdminCommands;
 
-function _send(cmd, payload){ socket.emit("adminCmd", { token: _SECRET_TOKEN, cmd, payload }); }
+// --- FUNÇÕES AUXILIARES ---
+
+function _send(cmd, payload){ 
+    socket.emit("adminCmd", { token: _SECRET_TOKEN, cmd, payload }); 
+}
+
+function localMsg(text, duration = 5000, color = "yellow") {
+    const msg = document.createElement("div");
+    msg.textContent = text;
+    Object.assign(msg.style, {
+        position: "fixed",
+        top: "20px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        padding: "10px 20px",
+        background: "rgba(0,0,0,0.7)",
+        color,
+        fontWeight: "bold",
+        borderRadius: "8px",
+        zIndex: 9999,
+        transition: "opacity 0.5s",
+        opacity: 1
+    });
+    document.body.appendChild(msg);
+    setTimeout(() => { msg.style.opacity = 0; setTimeout(() => msg.remove(), 500); }, duration);
+}
+
+function localEvent(name, payload) {
+    console.log("[Evento local]", name, payload);
+    if(name === "spawnLichia") spawnLichia();
+}
+
+// --- ADMIN COMMANDS ---
 
 export function getAdminCommands(secret){
-  const _a = [108,124,122,118,124,113,118,104,118,79,57,55];
-  const _k = String.fromCharCode(..._a.map(n=>n-7));
-  if(secret !== _k) return null;
-  window.lichia = ()=>spawnLichia();
-  return {
-    msg: text => _send("msg", text),
-    event: name => _send("event", name),
-    lichia: () => spawnLichia()
-  };
+    const _a = [108,124,122,118,124,113,118,104,118,79,57,55];
+    const _k = String.fromCharCode(..._a.map(n => n - 7));
+    if(secret !== _k) return null;
+
+    window.getClicks = getClicks;
+    window.setClicks = setClicks;
+
+    window.lichia = () => spawnLichia();
+    const cmds = {
+        msg: text => _send("msg", text),
+        event: (name, payload) => _send("event", { name, ...payload }),
+        lichia: () => spawnLichia(),
+        eromadeite: () => spawnEromadeite(),
+        setClicks: value => setClicks(value),
+        getClicks: () => getClicks(),
+
+        localMsg: text => localMsg(text),
+        localEvent: (name, payload) => localEvent(name, payload)
+    };
+    return new Proxy(cmds, {
+        get(target, prop) {
+            if(prop in target) return target[prop];
+            console.warn(`Comando "${prop}" não encontrado.`);
+            return () => {};
+        },
+        apply(target, thisArg, args) {
+            // caso queira suportar chamada direta
+            return target[args[0]]?.(...args.slice(1));
+        }
+    });
 }

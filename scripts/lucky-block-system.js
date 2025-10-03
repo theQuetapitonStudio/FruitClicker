@@ -1,6 +1,7 @@
 import { getClicks, setClicks, getYourFruit, setYourFruit, yourFruit } from "./index.js"
 import { fruits } from "./fruits.list.js"
 import { admMessage } from "./admMSG.js"
+import { saveData } from "./index.js"
 
 export let lucky_block_fruits = [
     { id: 1, nome: "Açai", chance: 3, power: 3, img: "./imgs/lb-fruits/açai.png" },
@@ -10,7 +11,7 @@ export let lucky_block_fruits = [
 
 export let plbHUD = [document.getElementById("potatoimg"), document.getElementById("potatoluckyblockHUD")]
 
-export function spawnPLB() {
+export function spawnEromadeite(duracao = 2000) {
     plbHUD[1].style.display = "block" 
     plbHUD[0].addEventListener("click", () => {
         fruits.push({
@@ -21,12 +22,15 @@ export function spawnPLB() {
             img: "./imgs/lb-fruits/eromadeite.png",
             isGold: false
         })
+        saveData()
     })
 
+    setTimeout(() => {
+        plbHUD[1].style.display = "none"
+    }, duracao)
     admMessage("O <strong style='color: red;'>EROMADEITE</strong> foi ativado com sucesso")
 }
 
-//spawnPLB()
 
 
 export function sortearfruita() {
