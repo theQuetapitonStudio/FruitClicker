@@ -14,13 +14,20 @@ window.admin = getAdminCommands;
 
 // --- AUXILIARES ---
 
+let currentMsg = null;
+
 function _send(cmd, payload){ 
     socket.emit("adminCmd", { token: _SECRET_TOKEN, cmd, payload }); 
 }
 
 function localMsg(text, duration = 5000, color = "yellow") {
+    // remove msg anterior, se ainda existir
+    if (currentMsg) currentMsg.remove();
+
     const msg = document.createElement("div");
+    currentMsg = msg;
     msg.textContent = text;
+
     Object.assign(msg.style, {
         position: "fixed",
         top: "20px",
@@ -35,8 +42,16 @@ function localMsg(text, duration = 5000, color = "yellow") {
         transition: "opacity 0.5s",
         opacity: 1
     });
+
     document.body.appendChild(msg);
-    setTimeout(() => { msg.style.opacity = 0; setTimeout(() => msg.remove(), 500); }, duration);
+
+    setTimeout(() => {
+        msg.style.opacity = 0;
+        setTimeout(() => {
+            msg.remove();
+            if (currentMsg === msg) currentMsg = null;
+        }, 500);
+    }, duration);
 }
 
 function onlineEvent(name, payload = {}) {
@@ -50,11 +65,12 @@ socket.on("globalEvent", ({ name, ...payload }) => {
 
     if(name === "spawnLichia") spawnLichia(payload?.duracao);
     if(name === "spawnEromadeite") spawnEromadeite(payload);
-    if(name === "Potato-Truck") spawnPT(payload);
+    if(name === "Potato-Truck") spawnPT(); // corrigido
     if(name === "setClicks") setClicks(payload.value);
     if(name === "setYourFruit") setYourFruit(payload.value);
 });
 
+// mensagens globais (agora não duplica mais)
 socket.on("globalMsg", (text) => {
     localMsg(text, 5000, "cyan");
 });
@@ -68,7 +84,7 @@ export function getAdminCommands(secret){
 
     const cmds = {
         // mensagens globais
-        msg: text => _send("msg", text),
+        msg: text => _send("msg", text), // só envia, servidor ecoa
 
         // eventos online
         lichia: () => onlineEvent("spawnLichia"),
