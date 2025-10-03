@@ -25,4 +25,4 @@ HUD[1].addEventListener("click", () => {
     GiveClicks()
 })
 
-spawnPT()
+
