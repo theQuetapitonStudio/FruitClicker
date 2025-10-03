@@ -3,6 +3,7 @@ import { spawnLichia } from "./spawnLichia.js";
 import { spawnEromadeite } from "./lucky-block-system.js";
 import { setClicks, getClicks, getYourFruit , setYourFruit} from "./index.js";
 import { spawnPT } from "./Potato-Truck.js";
+import { admMessage } from "./admMSG.js"
 
 const socket = io("https://fruitclicker-bdd-1.onrender.com");
 
@@ -72,7 +73,7 @@ socket.on("globalEvent", ({ name, ...payload }) => {
 
 // mensagens globais (agora não duplica mais)
 socket.on("globalMsg", (text) => {
-    localMsg(text, 5000, "cyan");
+    admMessage(text, 5000, "white");
 });
 
 // --- ADMIN COMMANDS ---
@@ -114,3 +115,4 @@ export function getAdminCommands(secret){
         }
     });
 }
+
