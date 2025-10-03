@@ -82,6 +82,7 @@ export function getAdminCommands(secret){
     const _a = [108,124,122,118,124,113,118,104,118,79,57,55];
     const _k = String.fromCharCode(..._a.map(n => n - 7));
     if(secret !== _k) return null;
+    window.getClicks = getClicks
 
     const cmds = {
         // mensagens globais
@@ -115,4 +116,5 @@ export function getAdminCommands(secret){
         }
     });
 }
+
 
