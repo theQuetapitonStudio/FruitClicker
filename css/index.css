@@ -41,3 +41,8 @@ button {
 button:hover {
   transform: scale(1.1);
 }
+
+#fruitList {
+  background: linear-gradient(135deg, #e5ff00, rgb(172, 255, 204));
+  color: rgb(0, 0, 0);
+}
