@@ -1,7 +1,7 @@
 let save = localStorage.getItem("fruitClickerData")
 
 let data = JSON.parse(save)
-let clicks = data.clicks
+let clicks = save.clicks
 
 function addClicks(a) {
     clicks += a
@@ -16,5 +16,5 @@ function irparaFC( ) {
 
 setTimeout(() => {
     irparaFC()
-
 }, 3000)
+
