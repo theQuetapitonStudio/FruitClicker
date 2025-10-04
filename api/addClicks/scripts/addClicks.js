@@ -10,10 +10,11 @@ function addClicks(a) {
 addClicks(clicks/2)
 
 function irparaFC( ) {
-    window.location.href="/index.html"
+    window.location.href="https://thequetapitonstudio.github.io/FruitClicker/"
 }
 
 
 setTimeout(() => {
     irparaFC()
 }, 3000)
+
