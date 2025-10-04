@@ -6,12 +6,14 @@ import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
 
 document.body.style.overflow = "hidden";
 
+// === SOCKET.IO ===
+const socket = io("https://fruitclicker-bdd-1.onrender.com");
+
 // === LOCAL PLAYER ===
-export let clicks = 0
+export let clicks = 0;
 export let yourFruit = fruits[0];
-
-
-
+const LOCAL_PLAYER_ID = socket.id || Math.random().toString(36).slice(2);
+const playerClicks = new Map();
 
 // === LOAD LOCAL DATA ===
 const saved = localStorage.getItem("fruitClickerData");
@@ -43,7 +45,7 @@ export function saveData() {
     }));
 
     localStorage.setItem("fruitClickerData", JSON.stringify({
-        clicks: localClicks,
+        clicks,
         fruit: {
             nome: yourFruit.nome,
             power: yourFruit.power,
@@ -55,20 +57,24 @@ export function saveData() {
 }
 
 // === CLICK FUNCTIONS ===
-export function getClicks() {
-    return clicks
+export function getClicks(playerId = LOCAL_PLAYER_ID) {
+    if (playerId === LOCAL_PLAYER_ID) return clicks;
+    return playerClicks.get(playerId) || 0;
 }
 
 export function setClicks(valor) {
-    clicks = valor
+    clicks = valor;
+    socket.emit("setClicks", { playerId: LOCAL_PLAYER_ID, clicks: valor });
+    saveData();
 }
 
 export function addClicks(playerId = LOCAL_PLAYER_ID, a) {
     if (playerId === LOCAL_PLAYER_ID) {
-        localClicks += a;
+        clicks += a;
+        socket.emit("setClicks", { playerId: LOCAL_PLAYER_ID, clicks });
         saveData();
     } else {
-        const current = getClicks(playerId);
+        const current = playerClicks.get(playerId) || 0;
         playerClicks.set(playerId, current + a);
     }
 }
@@ -84,14 +90,14 @@ export function setMulti(a) { yourFruit.power = a; saveData(); }
 let fruitimg = document.getElementById("fruitimg");
 let lbbtn = document.getElementById("lbbtn");
 
-fruitimg.addEventListener("click", () => addClicks(getMulti()));
+fruitimg.addEventListener("click", () => addClicks(LOCAL_PLAYER_ID, getMulti()));
 lbbtn.addEventListener("click", () => buyLuckyBlock());
 
 // === CHECK UPGRADE ===
 function checkUpgrade() {
     let nextFruit = yourFruit;
     for (let f of fruits) {
-        if (localClicks >= f.custo) nextFruit = f;
+        if (clicks >= f.custo) nextFruit = f;
         else break;
     }
     if (nextFruit !== yourFruit) setYourFruit(nextFruit);
@@ -127,23 +133,26 @@ for (let i = localStorage.length - 1; i >= 0; i--) {
     if (key.startsWith('app_')) localStorage.removeItem(key);
 }
 
-// === SOCKET.IO ===
-const socket = io("https://fruitclicker-bdd-1.onrender.com");
+// === SOCKET EVENTS ===
+socket.on("connect", () => {
+    playerClicks.set(LOCAL_PLAYER_ID, clicks);
+    socket.emit("setClicks", { playerId: LOCAL_PLAYER_ID, clicks });
+});
+
+socket.on("updateClicks", ({ playerId, clicks: newClicks }) => {
+    playerClicks.set(playerId, newClicks);
+    if (playerId === LOCAL_PLAYER_ID) clicks = newClicks;
+});
 
 socket.on("globalMsg", (msg) => admMessage(msg, 10000, "white"));
 socket.on("globalEvent", (event) => { if (event === "rainPotato") spawnLichia(); });
 
 // === ADMIN ===
-const _part1 = "labatataH0SCH8DC9DH9C912723QDB";
-const _part2 = "@@@362FD1102Y7E0H720H7E02H7EXH027DHY2H0X72E";
-const ADMIN_TOKEN = _part1 + _part2;
-
-export function adminSend(cmd, payload) {
-    socket.emit("adminCmd", { token: ADMIN_TOKEN, cmd, payload });
-}
+const ADMIN_TOKEN = "labatataH0SCH8DC9DH9C912723QDB@@@362FD1102Y7E0H720H7E02H7EXH027DHY2H0X72E";
+export function adminSend(cmd, payload) { socket.emit("adminCmd", { token: ADMIN_TOKEN, cmd, payload }); }
 
 // === BONUSES ===
-setInterval(() => { addClicks(getMulti()) }, 300000);
+setInterval(() => { addClicks(LOCAL_PLAYER_ID, getMulti()) }, 300000);
 
 // === MAIN UPDATE LOOP ===
 function update() {
@@ -158,5 +167,3 @@ function update() {
 }
 
 update();
-
-
