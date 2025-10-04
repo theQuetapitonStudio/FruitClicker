@@ -1,21 +1,19 @@
-let save = localStorage.getItem("fruitClickerData");
+let save = localStorage.getItem("fruitClickerData")
 
-let data = save ? JSON.parse(save) : { clicks: 0 };
-
-let clicks = data.clicks;
+let data = JSON.parse(save)
+let clicks = data.clicks
 
 function addClicks(a) {
-    clicks += a;
-    data.clicks = clicks;
-    localStorage.setItem("fruitClickerData", JSON.stringify(data));
+    clicks += a
 }
 
-addClicks(10);
+addClicks(clicks/2)
 
-function irparaFC() {
-    window.location.href = "https://thequetapitonstudio.github.io/FruitClicker/";
+function irparaFC( ) {
+    window.location.href="/index.html"
 }
+
 
 setTimeout(() => {
-    irparaFC();
-}, 3000);
+    irparaFC()
+}, 3000)
