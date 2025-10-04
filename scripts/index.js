@@ -7,6 +7,7 @@ import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
 document.body.style.overflow = "hidden";
 
 // === LOCAL PLAYER ===
+export let clicks = 0
 export let yourFruit = fruits[0];
 
 
@@ -157,4 +158,5 @@ function update() {
 }
 
 update();
+
 
