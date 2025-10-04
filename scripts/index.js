@@ -8,17 +8,15 @@ document.body.style.overflow = "hidden";
 
 // === LOCAL PLAYER ===
 export let yourFruit = fruits[0];
-let localClicks = 0;
 
-// === MULTIPLAYER ===
-export const playerClicks = new Map(); // playerId -> clicks
-const LOCAL_PLAYER_ID = "me";
+
+
 
 // === LOAD LOCAL DATA ===
 const saved = localStorage.getItem("fruitClickerData");
 if (saved) {
     const data = JSON.parse(saved);
-    localClicks = data.clicks || 0;
+    clicks = data.clicks || 0;
 
     if (data.fruits) {
         data.fruits.forEach(savedFruit => {
@@ -56,18 +54,12 @@ export function saveData() {
 }
 
 // === CLICK FUNCTIONS ===
-export function getClicks(playerId = LOCAL_PLAYER_ID) {
-    if (playerId === LOCAL_PLAYER_ID) return localClicks;
-    return playerClicks.get(playerId) || 0;
+export function getClicks() {
+    return clicks
 }
 
-export function setClicks(playerId = LOCAL_PLAYER_ID, a) {
-    if (playerId === LOCAL_PLAYER_ID) {
-        localClicks = a;
-        saveData();
-    } else {
-        playerClicks.set(playerId, a);
-    }
+export function setClicks(valor) {
+    clicks = valor
 }
 
 export function addClicks(playerId = LOCAL_PLAYER_ID, a) {
@@ -157,7 +149,7 @@ function update() {
     requestAnimationFrame(update);
     checkUpgrade();
 
-    document.getElementById("clickmsg").textContent = `Clicks: ${formatNumber(Math.round(localClicks))}`;
+    document.getElementById("clickmsg").textContent = `Clicks: ${formatNumber(Math.round(clicks))}`;
     document.getElementById("multimsg").textContent = `Multiplicador: ${formatNumber(Math.round(getMulti()))}X`;
     document.getElementById("fruitmsg").textContent = `Fruta: ${yourFruit.nome}`;
     document.getElementById("tutorialmsg").innerHTML = `Clique na <span style="color:red;">${yourFruit.nome}</span>`;
@@ -165,3 +157,4 @@ function update() {
 }
 
 update();
+
