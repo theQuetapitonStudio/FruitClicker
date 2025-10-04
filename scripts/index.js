@@ -12,6 +12,7 @@ let localClicks = 0;
 
 // === MULTIPLAYER ===
 export const playerClicks = new Map(); // playerId -> clicks
+const LOCAL_PLAYER_ID = "me";
 
 // === LOAD LOCAL DATA ===
 const saved = localStorage.getItem("fruitClickerData");
@@ -55,14 +56,28 @@ export function saveData() {
 }
 
 // === CLICK FUNCTIONS ===
-export function getLocalClicks() { return localClicks; }
-export function addLocalClicks(a) { localClicks += a; saveData(); }
+export function getClicks(playerId = LOCAL_PLAYER_ID) {
+    if (playerId === LOCAL_PLAYER_ID) return localClicks;
+    return playerClicks.get(playerId) || 0;
+}
 
-export function getClicks(playerId) { return playerClicks.get(playerId) || 0; }
-export function setClicks(playerId, a) { playerClicks.set(playerId, a); }
-export function addClicks(playerId, a) {
-    const current = getClicks(playerId);
-    playerClicks.set(playerId, current + a);
+export function setClicks(playerId = LOCAL_PLAYER_ID, a) {
+    if (playerId === LOCAL_PLAYER_ID) {
+        localClicks = a;
+        saveData();
+    } else {
+        playerClicks.set(playerId, a);
+    }
+}
+
+export function addClicks(playerId = LOCAL_PLAYER_ID, a) {
+    if (playerId === LOCAL_PLAYER_ID) {
+        localClicks += a;
+        saveData();
+    } else {
+        const current = getClicks(playerId);
+        playerClicks.set(playerId, current + a);
+    }
 }
 
 // === FRUIT FUNCTIONS ===
@@ -76,7 +91,7 @@ export function setMulti(a) { yourFruit.power = a; saveData(); }
 let fruitimg = document.getElementById("fruitimg");
 let lbbtn = document.getElementById("lbbtn");
 
-fruitimg.addEventListener("click", () => addLocalClicks(getMulti()));
+fruitimg.addEventListener("click", () => addClicks(getMulti()));
 lbbtn.addEventListener("click", () => buyLuckyBlock());
 
 // === CHECK UPGRADE ===
@@ -135,7 +150,7 @@ export function adminSend(cmd, payload) {
 }
 
 // === BONUSES ===
-setInterval(() => { addLocalClicks(10) }, 300000);
+setInterval(() => { addClicks(getMulti()) }, 300000);
 
 // === MAIN UPDATE LOOP ===
 function update() {
