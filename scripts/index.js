@@ -112,6 +112,13 @@ export function adminSend(cmd, payload) {
     socket.emit("adminCmd", { token: ADMIN_TOKEN, cmd, payload });
 }
 
+// get Bonus 
+
+setInterval(() => {
+    clicks += 10
+},300000 )
+
+
 function update() {
     requestAnimationFrame(update);
     checkUpgrade();
@@ -123,3 +130,4 @@ function update() {
 }
 
 update();
+
