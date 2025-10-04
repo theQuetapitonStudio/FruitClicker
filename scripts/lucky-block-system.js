@@ -4,7 +4,7 @@ import { admMessage } from "./admMSG.js"
 import { saveData } from "./index.js"
 
 export let lucky_block_fruits = [
-    { id: 1, nome: "Açai", chance: 3, power: 3, img: "./imgs/lb-fruits/açai.png" },
+    { id: 1, nome: "Açai", chance: 3, power: 3, img: "./imgs/lb-fruits/açai.webp" },
     { id: 2, nome: "Carambola", chance: 2, power: 2, img: "./imgs/lb-fruits/carambola.png" },
     { id: 3, nome: "Maçã roxa", chance: 1, power: 1, img: "./imgs/lb-fruits/purple-apple.png" }
 ]
@@ -17,7 +17,7 @@ export function spawnEromadeite(duracao = 2000) {
         fruits.push({
             id: yourFruit.id + 1,
             nome: "Eromadeite",
-            custo: getClicks() + 1,
+            custo: getClicks(),
             power:  yourFruit.power * 2,
             img: "./imgs/lb-fruits/eromadeite.png",
             isGold: false
