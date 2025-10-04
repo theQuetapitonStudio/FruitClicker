@@ -66,7 +66,7 @@ socket.on("globalEvent", ({ name, ...payload }) => {
 
     if(name === "spawnLichia") spawnLichia(payload?.duracao);
     if(name === "spawnEromadeite") spawnEromadeite(payload);
-    if(name === "Potato-Truck") spawnPT(); // corrigido
+    if(name === "Potato-Truck") spawnPT; 
     if(name === "setClicks") setClicks(payload.value);
     if(name === "setYourFruit") setYourFruit(payload.value);
 });
@@ -116,5 +116,6 @@ export function getAdminCommands(secret){
         }
     });
 }
+
 
 
