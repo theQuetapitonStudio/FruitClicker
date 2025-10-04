@@ -6,16 +6,19 @@ import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
 
 document.body.style.overflow = "hidden";
 
-export let clicks = 0;
+// === LOCAL PLAYER ===
 export let yourFruit = fruits[0];
+let localClicks = 0;
 
-let fruitimg = document.getElementById("fruitimg");
-let lbbtn = document.getElementById("lbbtn");
+// === MULTIPLAYER ===
+export const playerClicks = new Map(); // playerId -> clicks
 
+// === LOAD LOCAL DATA ===
 const saved = localStorage.getItem("fruitClickerData");
 if (saved) {
     const data = JSON.parse(saved);
-    clicks = data.clicks || 0;
+    localClicks = data.clicks || 0;
+
     if (data.fruits) {
         data.fruits.forEach(savedFruit => {
             const f = fruits.find(fruit => fruit.nome === savedFruit.nome);
@@ -23,12 +26,14 @@ if (saved) {
             else fruits.push(savedFruit);
         });
     }
+
     if (data.fruit) {
         const f = fruits.find(fruit => fruit.nome === data.fruit.nome);
         yourFruit = f || { ...data.fruit };
     }
 }
 
+// === SAVE LOCAL DATA ===
 export function saveData() {
     const fruitData = fruits.map(f => ({
         nome: f.nome,
@@ -36,8 +41,9 @@ export function saveData() {
         custo: f.custo,
         img: f.img
     }));
+
     localStorage.setItem("fruitClickerData", JSON.stringify({
-        clicks,
+        clicks: localClicks,
         fruit: {
             nome: yourFruit.nome,
             power: yourFruit.power,
@@ -48,29 +54,42 @@ export function saveData() {
     }));
 }
 
-export function getClicks() { return clicks; }
-export function setClicks(a) { clicks = a; saveData(); }
+// === CLICK FUNCTIONS ===
+export function getLocalClicks() { return localClicks; }
+export function addLocalClicks(a) { localClicks += a; saveData(); }
 
+export function getClicks(playerId) { return playerClicks.get(playerId) || 0; }
+export function setClicks(playerId, a) { playerClicks.set(playerId, a); }
+export function addClicks(playerId, a) {
+    const current = getClicks(playerId);
+    playerClicks.set(playerId, current + a);
+}
+
+// === FRUIT FUNCTIONS ===
 export function getYourFruit() { return yourFruit; }
 export function setYourFruit(f) { yourFruit = f; saveData(); }
 
 export function getMulti() { return yourFruit.power; }
 export function setMulti(a) { yourFruit.power = a; saveData(); }
 
-export function addClicks(a) { clicks += a; saveData(); }
+// === DOM ELEMENTS ===
+let fruitimg = document.getElementById("fruitimg");
+let lbbtn = document.getElementById("lbbtn");
 
-fruitimg.addEventListener("click", () => addClicks(getMulti()));
+fruitimg.addEventListener("click", () => addLocalClicks(getMulti()));
 lbbtn.addEventListener("click", () => buyLuckyBlock());
 
+// === CHECK UPGRADE ===
 function checkUpgrade() {
     let nextFruit = yourFruit;
     for (let f of fruits) {
-        if (clicks >= f.custo) nextFruit = f;
+        if (localClicks >= f.custo) nextFruit = f;
         else break;
     }
     if (nextFruit !== yourFruit) setYourFruit(nextFruit);
 }
 
+// === FORMAT NUMBERS ===
 function formatNumber(num) {
     if (num < 1000) return num.toString();
     const suffixes = ["", "k", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"];
@@ -94,16 +113,19 @@ function formatNumber(num) {
     return scaled.toFixed(2).replace(/\.00$/, '') + suffix;
 }
 
+// === CLEAR OLD APP STORAGE ===
 for (let i = localStorage.length - 1; i >= 0; i--) {
     const key = localStorage.key(i);
     if (key.startsWith('app_')) localStorage.removeItem(key);
 }
 
+// === SOCKET.IO ===
 const socket = io("https://fruitclicker-bdd-1.onrender.com");
 
 socket.on("globalMsg", (msg) => admMessage(msg, 10000, "white"));
 socket.on("globalEvent", (event) => { if (event === "rainPotato") spawnLichia(); });
 
+// === ADMIN ===
 const _part1 = "labatataH0SCH8DC9DH9C912723QDB";
 const _part2 = "@@@362FD1102Y7E0H720H7E02H7EXH027DHY2H0X72E";
 const ADMIN_TOKEN = _part1 + _part2;
@@ -112,17 +134,15 @@ export function adminSend(cmd, payload) {
     socket.emit("adminCmd", { token: ADMIN_TOKEN, cmd, payload });
 }
 
-// get Bonus 
+// === BONUSES ===
+setInterval(() => { addLocalClicks(10) }, 300000);
 
-setInterval(() => {
-    clicks += 10
-},300000 )
-
-
+// === MAIN UPDATE LOOP ===
 function update() {
     requestAnimationFrame(update);
     checkUpgrade();
-    document.getElementById("clickmsg").textContent = `Clicks: ${formatNumber(Math.round(clicks))}`;
+
+    document.getElementById("clickmsg").textContent = `Clicks: ${formatNumber(Math.round(localClicks))}`;
     document.getElementById("multimsg").textContent = `Multiplicador: ${formatNumber(Math.round(getMulti()))}X`;
     document.getElementById("fruitmsg").textContent = `Fruta: ${yourFruit.nome}`;
     document.getElementById("tutorialmsg").innerHTML = `Clique na <span style="color:red;">${yourFruit.nome}</span>`;
@@ -130,4 +150,3 @@ function update() {
 }
 
 update();
-
