@@ -57,14 +57,12 @@ export function saveData() {
 }
 
 // === CLICK FUNCTIONS ===
-export function getClicks(playerId = LOCAL_PLAYER_ID) {
-    if (playerId === LOCAL_PLAYER_ID) return clicks;
-    return playerClicks.get(playerId) || 0;
+export function getClicks() {
+    return clicks
 }
 
 export function setClicks(valor) {
     clicks = valor;
-    socket.emit("setClicks", { playerId: LOCAL_PLAYER_ID, clicks: valor });
     saveData();
 }
 
