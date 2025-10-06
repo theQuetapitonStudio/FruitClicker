@@ -1,6 +1,6 @@
 export function admMessage(message, duration = 10000, color = "white") {
     let msg = document.createElement("div");
-    msg.innerHTML = "<strong style='color: blue;'>Quetapiton: </strong> " + message;
+    msg.innerHTML = "<strong style='color: blue;'>DDDEV: </strong> " + message;
     msg.style.position = "fixed";
     msg.style.top = "20px";
     msg.style.left = "50%";
@@ -27,3 +27,4 @@ export function admMessage(message, duration = 10000, color = "white") {
         }, { once: true });
     }, duration);
 }
+
