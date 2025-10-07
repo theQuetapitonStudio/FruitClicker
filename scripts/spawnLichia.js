@@ -15,18 +15,6 @@ export function spawnLichia(duracao = 5000) {
     };
 
     fruits.push(lichia);
-    admMessage("A <strong style='color: yellow'>LICHIA</strong> foi adicionada!");
-
-    setTimeout(() => {
-        const index = fruits.findIndex(f => f.id === lichia.id);
-        if (index !== -1) {
-            fruits.splice(index, 1);
-
-            if (currentFruit && currentFruit.id === lichia.id) {
-                currentFruit = fruits[0]; 
-            }
-
-            admMessage("A <strong style='color: yellow'>LICHIA</strong> sumiu!");
-        }
-    }, duracao);
+    admMessage("A <strong style='color: yellow'>LICHIA</strong> foi adicionada!")
 }
+
