@@ -15,7 +15,7 @@ export function spawnEromadeite(duracao = 2000) {
     plbHUD[1].style.display = "block" 
     plbHUD[0].addEventListener("click", () => {
         fruits.push({
-            id: yourFruit.id + 1,
+            id: getYourFruit().id + 1,
             nome: "Eromadeite",
             custo: getClicks(),
             power:  yourFruit.power * 2,

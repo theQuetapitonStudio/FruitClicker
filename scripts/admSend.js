@@ -4,6 +4,7 @@ import { spawnEromadeite } from "./lucky-block-system.js";
 import { setClicks, getClicks, getYourFruit , setYourFruit} from "./index.js";
 import { spawnPT } from "./Potato-Truck.js";
 import { admMessage } from "./admMSG.js"
+import { DobroClicks } from "./dobroClicks.js";
 
 const socket = io("https://fruitclicker-bdd-1.onrender.com");
 
@@ -35,7 +36,7 @@ function localMsg(text, duration = 5000, color = "yellow") {
         left: "50%",
         transform: "translateX(-50%)",
         padding: "10px 20px",
-        background: "rgba(0,0,0,0.7)",
+        background: "rgba(0, 0, 0, 1)",
         color,
         fontWeight: "bold",
         borderRadius: "8px",
@@ -69,6 +70,7 @@ socket.on("globalEvent", ({ name, ...payload }) => {
     if(name === "Potato-Truck") spawnPT(payload?.duracao); 
     if(name === "setClicks") setClicks(payload.value);
     if(name === "setYourFruit") setYourFruit(payload.value);
+    if (name === "X2clicks") DobroClicks(payload.value)
 });
 
 // mensagens globais (agora não duplica mais)
@@ -92,6 +94,7 @@ export function getAdminCommands(secret){
         lichia: () => onlineEvent("spawnLichia"),
         eromadeite: () => onlineEvent("spawnEromadeite"),
         potato_truck: () => onlineEvent("Potato-Truck"),
+        clicks2X: (tempo = 10000) => onlineEvent("X2clicks", { value: tempo }),
 
         // setters online
         setClicks: value => onlineEvent("setClicks", { value }),

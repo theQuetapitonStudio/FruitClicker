@@ -86,10 +86,10 @@ export function setMulti(a) { yourFruit.power = a; saveData(); }
 
 // === DOM ELEMENTS ===
 let fruitimg = document.getElementById("fruitimg");
-let lbbtn = document.getElementById("lbbtn");
+if (fruitimg) fruitimg.addEventListener("click", () => addClicks(LOCAL_PLAYER_ID, getMulti()));
 
-fruitimg.addEventListener("click", () => addClicks(LOCAL_PLAYER_ID, getMulti()));
-lbbtn.addEventListener("click", () => buyLuckyBlock());
+let lbbtn = document.getElementById("lbbtn");
+if (lbbtn) lbbtn.addEventListener("click", () => buyLuckyBlock());
 
 // === CHECK UPGRADE ===
 function checkUpgrade() {
@@ -138,6 +138,9 @@ socket.on("connect", () => {
 });
 
 socket.on("updateClicks", ({ playerId, clicks: newClicks }) => {
+    // Se o efeito de dobro está ativo, ignora updates do servidor
+    if (window.ignoreServerUpdates) return;
+
     playerClicks.set(playerId, newClicks);
     if (playerId === LOCAL_PLAYER_ID) clicks = newClicks;
 });
