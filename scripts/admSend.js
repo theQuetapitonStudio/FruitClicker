@@ -1,10 +1,11 @@
 import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
 import { spawnLichia } from "./spawnLichia.js";
-import { spawnEromadeite } from "./lucky-block-system.js";
 import { setClicks, getClicks, getYourFruit , setYourFruit} from "./index.js";
 import { spawnPT } from "./Potato-Truck.js";
 import { admMessage } from "./admMSG.js"
 import { DobroClicks } from "./dobroClicks.js";
+import { goldApple } from "./spawnGoldApple.js";
+import { RubiApple } from "./spawnRubiApple.js";
 
 const socket = io("https://fruitclicker-bdd-1.onrender.com");
 
@@ -13,6 +14,7 @@ const _p2 = "@@@362FD1102Y7E0H720H7E02H7EXH027DHY2H0X72E";
 const _SECRET_TOKEN = _p1 + _p2;
 
 window.admin = getAdminCommands;
+
 
 // --- AUXILIARES ---
 
@@ -66,11 +68,12 @@ socket.on("globalEvent", ({ name, ...payload }) => {
     console.log("[Evento online]", name, payload);
 
     if(name === "spawnLichia") spawnLichia(payload?.duracao);
-    if(name === "spawnEromadeite") spawnEromadeite(payload);
     if(name === "Potato-Truck") spawnPT(payload?.duracao); 
     if(name === "setClicks") setClicks(payload.value);
     if(name === "setYourFruit") setYourFruit(payload.value);
     if (name === "X2clicks") DobroClicks(payload.value)
+    if (name === "gold-apple") goldApple()
+    if (name === "rubi-apple") RubiApple()
 });
 
 // mensagens globais (agora não duplica mais)
@@ -95,7 +98,8 @@ export function getAdminCommands(secret){
         eromadeite: () => onlineEvent("spawnEromadeite"),
         potato_truck: () => onlineEvent("Potato-Truck"),
         clicks2X: (tempo = 10000) => onlineEvent("X2clicks", { value: tempo }),
-
+        gold_apple: () => onlineEvent("gold-apple"),
+        rubi_apple: () => onlineEvent("rubi-apple"),
         // setters online
         setClicks: value => onlineEvent("setClicks", { value }),
         setYourFruit: value => onlineEvent("setYourFruit", { value }),
@@ -119,8 +123,3 @@ export function getAdminCommands(secret){
         }
     });
 }
-
-
-
-
-

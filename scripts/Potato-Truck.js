@@ -15,7 +15,7 @@ function GiveClicks() {
     if (getClicks() < 1000) return
     setClicks(getClicks() - 1000)
     fruits.forEach(fruit => {
-        fruit.power *= 1.1
+        fruit.power *= 1.01
     })
 
     saveData()

@@ -93,6 +93,8 @@ if (lbbtn) lbbtn.addEventListener("click", () => buyLuckyBlock());
 
 // === CHECK UPGRADE ===
 function checkUpgrade() {
+    if (yourFruit.isGold) return; // não regride fruta especial
+
     let nextFruit = yourFruit;
     for (let f of fruits) {
         if (clicks >= f.custo) nextFruit = f;
@@ -100,6 +102,7 @@ function checkUpgrade() {
     }
     if (nextFruit !== yourFruit) setYourFruit(nextFruit);
 }
+
 
 // === FORMAT NUMBERS ===
 function formatNumber(num) {
@@ -154,6 +157,40 @@ export function adminSend(cmd, payload) { socket.emit("adminCmd", { token: ADMIN
 
 // === BONUSES ===
 setInterval(() => { addClicks(LOCAL_PLAYER_ID, getMulti()) }, 300000);
+
+
+function checkGoldApple() {
+    const goldData = JSON.parse(localStorage.getItem("goldAppleData"));
+    if (goldData && goldData.isGold) {
+        // Garante aparência dourada, mas não duplica o boost
+        const atual = getYourFruit();
+        const goldVisual = {
+            ...atual,
+            nome: "Gold Apple",
+            img: "./imgs/gold-apple.webp",
+            isGold: true
+        };
+        setYourFruit(goldVisual);
+    }
+}
+
+
+
+function checkRubiApple() {
+    const rubiData = JSON.parse(localStorage.getItem("RubiAppleData"));
+    if (rubiData && rubiData.isGold) {
+        // Garante aparência dourada, mas não duplica o boost
+        const atual = getYourFruit();
+        const goldVisual = {
+            ...atual,
+            nome: "Rubi Apple",
+            img: "./imgs/rubi-apple.webp",
+            isGold: true
+        };
+        setYourFruit(goldVisual);
+    }
+}
+checkGoldApple();
 
 // === MAIN UPDATE LOOP ===
 function update() {

@@ -12,7 +12,7 @@ export function DobroClicks(tempo = 10000) {
     // Intervalo que dobra os clicks a cada 0.5s
     const interval = setInterval(() => {
         const atual = getClicks();
-        const novo = atual * 2;
+        const novo = atual * 1.1;
         setClicks(novo);
         console.log(`[DobroClicks] ${atual} → ${novo}`);
     }, 500);

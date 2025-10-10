@@ -65,6 +65,10 @@ export let fruits = [
     {
         id: 23, nome: "Papaya", custo: 2250, power: 26, img: "./imgs/Papaya.png"
     }
-,{
+    ,{
         id: 24, nome: "Pomelo", custo: 3000, power: +30, img: "./imgs/pomelo.png"
-    }]
+    },
+    {
+        id: 25, nome: "Maçã diamante", custo: 3300, power: +32, img: "./imgs/diamond-apple.png"
+    }
+]

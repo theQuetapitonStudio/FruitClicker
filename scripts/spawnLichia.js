@@ -9,7 +9,7 @@ export function spawnLichia(duracao = 5000) {
         id: lichiaId++,
         nome: "Lichia",
         custo: 5000,
-        power: getMulti() * 1.5,
+        power: getMulti() * 1.1,
         img: "./imgs/lichia.webp"
     };
 
