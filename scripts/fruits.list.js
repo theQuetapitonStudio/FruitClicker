@@ -72,3 +72,4 @@ export let fruits = [
         id: 25, nome: "Maçã diamante", custo: 3300, power: +32, img: "./imgs/diamond-apple.png"
     }
 ]
+
